@@ -19,7 +19,7 @@ if(!isset($_SESSION['login'])){
 // CSRF TOKEN
 // =======================
 if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    $_SESSION['csrf_token'] = bin2hex(uniqid(mt_rand(), true));
 }
 $csrf_token = $_SESSION['csrf_token'];
 
@@ -31,8 +31,8 @@ $user_id = $_SESSION['user_id'];
 
 $nama_guru = $_SESSION['name'];
 
-$upload_message = $_SESSION['upload_message'] ?? "";
-$upload_status = $_SESSION['upload_status'] ?? "";
+$upload_message = isset($_SESSION['upload_message']) ? $_SESSION['upload_message'] : "";
+$upload_status = isset($_SESSION['upload_status']) ? $_SESSION['upload_status'] : "";
 
 unset($_SESSION['upload_message']);
 unset($_SESSION['upload_status']);
@@ -40,9 +40,9 @@ unset($_SESSION['upload_status']);
 // =======================
 // POPUP REQUEST NOTIFIKASI
 // =======================
-$req_popup_type = $_SESSION['req_popup_type'] ?? '';
-$req_popup_title = $_SESSION['req_popup_title'] ?? '';
-$req_popup_msg = $_SESSION['req_popup_msg'] ?? '';
+$req_popup_type = isset($_SESSION['req_popup_type']) ? $_SESSION['req_popup_type'] : '';
+$req_popup_title = isset($_SESSION['req_popup_title']) ? $_SESSION['req_popup_title'] : '';
+$req_popup_msg = isset($_SESSION['req_popup_msg']) ? $_SESSION['req_popup_msg'] : '';
 unset($_SESSION['req_popup_type']);
 unset($_SESSION['req_popup_title']);
 unset($_SESSION['req_popup_msg']);
@@ -115,7 +115,7 @@ if($user_data && !empty($user_data['full_name'])){
 
 }
 
-$profile_photo = $user_data['profile_photo'] ?? "";
+$profile_photo = isset($user_data['profile_photo']) ? $user_data['profile_photo'] : "";
 $profile_photo_path = "";
 
 if(!empty($profile_photo) && file_exists(__DIR__ . "/" . $profile_photo)){
@@ -162,7 +162,7 @@ if(isset($_POST['upload_profile_photo'])){
         $tmp_name = $_FILES['profile_photo']['tmp_name'];
         $extension = strtolower(pathinfo($_FILES['profile_photo']['name'], PATHINFO_EXTENSION));
         $image_info = getimagesize($tmp_name);
-        $mime_type = $image_info['mime'] ?? "";
+        $mime_type = isset($image_info['mime']) ? $image_info['mime'] : "";
 
         if(
             !in_array($extension, $allowed_extensions)
@@ -455,7 +455,8 @@ $total_external_query = mysqli_query($conn, "
     FROM users
     WHERE role_id = 4
 ");
-$total_external = mysqli_fetch_assoc($total_external_query)['total_contributor'] ?? 0;
+$total_external_data = mysqli_fetch_assoc($total_external_query);
+$total_external = isset($total_external_data['total_contributor']) ? $total_external_data['total_contributor'] : 0;
 
 // =======================
 // DATA UNTUK MODAL EXTERNAL CONTRIBUTOR
@@ -2003,7 +2004,7 @@ if($total_upload_guru == 0){
                  <div class="request-card">
                      <div>
                          <strong style="color:#2c3e50; font-size:15px;"><?= htmlspecialchars($open_req['full_name']); ?></strong><br>
-                         <span style="color:#7f8c8d; font-size:12px;"><?= htmlspecialchars($open_req['school_name'] ?? '-'); ?></span>
+                         <span style="color:#7f8c8d; font-size:12px;"><?= htmlspecialchars(isset($open_req['school_name']) ? $open_req['school_name'] : '-'); ?></span>
                          <div style="margin-top:12px; margin-bottom:12px;">
                              <span style="display:inline-block; background:#ecf0f1; color:#34495e; padding:5px 10px; border-radius:6px; font-size:11px; font-weight:bold;"><?= htmlspecialchars($open_req['jenis_request']); ?></span>
                          </div>
@@ -2048,7 +2049,7 @@ if($total_upload_guru == 0){
                         while($login = mysqli_fetch_assoc($recent_logins_query)){
                             $login_time = date('H:i', strtotime($login['login_time']));
                             $initial_login = strtoupper(substr(trim($login['full_name']), 0, 1));
-                            $photo_login = $login['profile_photo'] ?? '';
+                            $photo_login = isset($login['profile_photo']) ? $login['profile_photo'] : '';
                             $is_me = ($login['id'] == $user_id);
                         ?>
                         <div class="active-teacher-card">
@@ -2065,7 +2066,7 @@ if($total_upload_guru == 0){
                                     <?= $is_me ? '<span style="color:#27ae60; font-size:11px;">(Anda)</span>' : ''; ?>
                                 </strong>
                                 <span style="color:#7f8c8d; font-size:12px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                                    <?= htmlspecialchars($login['school_name'] ?? '-'); ?>
+                                    <?= htmlspecialchars(isset($login['school_name']) ? $login['school_name'] : '-'); ?>
                                 </span>
                                 <?php if($login['role_id'] == 4){ echo '<div style="margin-top:4px;"><span style="display:inline-block; background:#fdf2e9; color:#e67e22; padding:2px 6px; border-radius:4px; font-size:10px; border:1px solid #f39c12;">Ext. Contributor</span></div>'; } ?>
                                 <?php if($login['role_id'] == 1){ echo '<div style="margin-top:4px;"><span style="display:inline-block; background:#ebf5ff; color:#2980b9; padding:2px 6px; border-radius:4px; font-size:10px; border:1px solid #3498db;">Admin</span></div>'; } ?>
@@ -2128,7 +2129,7 @@ if($total_upload_guru == 0){
                     ?>
                     <tr style="border-bottom: 1px solid #eee;">
                         <td style="padding: 15px; color: #34495e; font-weight: bold;"><?= htmlspecialchars($g['full_name']); ?></td>
-                        <td style="padding: 15px; color: #7f8c8d;"><?= htmlspecialchars($g['school_name'] ?? '-'); ?></td>
+                        <td style="padding: 15px; color: #7f8c8d;"><?= htmlspecialchars(isset($g['school_name']) ? $g['school_name'] : '-'); ?></td>
                     </tr>
                     <?php } } else { ?>
                     <tr>
@@ -2162,7 +2163,7 @@ if($total_upload_guru == 0){
                     ?>
                     <tr style="border-bottom: 1px solid #eee;">
                         <td style="padding: 15px; color: #34495e;"><strong><?= htmlspecialchars($e['contributor_name']); ?></strong></td>
-                        <td style="padding: 15px; color: #7f8c8d;"><?= htmlspecialchars($e['contributor_institution'] ?? '-'); ?></td>
+                        <td style="padding: 15px; color: #7f8c8d;"><?= htmlspecialchars(isset($e['contributor_institution']) ? $e['contributor_institution'] : '-'); ?></td>
                     </tr>
                     <?php } } else { ?>
                     <tr>
