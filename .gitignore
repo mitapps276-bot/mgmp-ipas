@@ -1,0 +1,7 @@
+/assets/uploads/
+/uploads/
+/.vscode/
+/.idea/
+*.log
+
+config/database.php
